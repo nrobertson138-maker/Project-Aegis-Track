@@ -179,7 +179,4 @@ if __name__ == "__main__":
 
     tracker = AegisTracker(local_only=args.local_only)
     tracker.watch_log()
-Use code with caution.
-Next Steps to Apply the Fix:
-Clear your file completely or copy this corrected block.
-Open the file on your machine (nano /home/nrobertson138/aegis_track.py), delete everything, paste this text block, and save (Ctrl + O, Enter, Ctrl + X).
+
