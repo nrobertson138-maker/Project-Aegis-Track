@@ -60,7 +60,7 @@ class AegisTracker:
         if self.local_only:
             return
             
-        payload_bytes = json.dumps(alert_payload).encode('utf-8')
+        payload_bytes = json.dumps(alert_payload, ensure_ascii=True).encode('utf-8')
         method = 'PUT'
         service = 's3'
         
@@ -75,9 +75,12 @@ class AegisTracker:
         # URI FIX: Canonical URI must strictly match the absolute resource path
         canonical_uri = f'/{object_name}'
         canonical_querystring = ''
-        canonical_headers = f'host:{host}\nx-amz-date:{amz_date}\n'
-        signed_headers = 'host;x-amz-date'
+        
+        # FIX: Added x-amz-content-sha256 header parameter to resolve strict S3 V4 Signature mandates
         payload_hash = hashlib.sha256(payload_bytes).hexdigest()
+        canonical_headers = f'host:{host}\nx-amz-content-sha256:{payload_hash}\nx-amz-date:{amz_date}\n'
+        signed_headers = 'host;x-amz-content-sha256;x-amz-date'
+        
         canonical_request = f"{method}\n{canonical_uri}\n{canonical_querystring}\n{canonical_headers}\n{signed_headers}\n{payload_hash}"
         
         algorithm = 'AWS4-HMAC-SHA256'
@@ -91,9 +94,10 @@ class AegisTracker:
         headers = {
             'Host': host,
             'x-amz-date': amz_date,
+            'x-amz-content-sha256': payload_hash,
             'Authorization': authorization_header,
             'Content-Type': 'application/json',
-            'Content-Length': str(len(payload_bytes)) # Explicitly broadcast size metric
+            'Content-Length': str(len(payload_bytes))
         }
         
         try:
@@ -103,6 +107,8 @@ class AegisTracker:
                     print(f"[CLOUD SUCCESS] Immutable log archived -> {object_name}")
         except Exception as e:
             print(f"[CLOUD ERROR] Out-of-band pipeline degraded: {e}")
+            if hasattr(e, 'read'):
+                print(f"[AWS RAW RESPONSE] {e.read().decode('utf-8')}")
 
     def parse_log_line(self, line):
         current_time = time.time()
@@ -143,7 +149,6 @@ class AegisTracker:
         with open(ALERT_LOG_PATH, "a") as alert_file:
             alert_file.write(json.dumps(alert_payload) + "\n")
             
-        # File pathing structure inside S3 separates logs dynamically by host node
         object_name = f"alerts/{self.hostname}/{datetime.utcnow().strftime('%Y/%m/%d')}/incident_{unique_id}.json"
         self.forward_to_s3(alert_payload, object_name)
         
@@ -174,4 +179,7 @@ if __name__ == "__main__":
 
     tracker = AegisTracker(local_only=args.local_only)
     tracker.watch_log()
-
+Use code with caution.
+Next Steps to Apply the Fix:
+Clear your file completely or copy this corrected block.
+Open the file on your machine (nano /home/nrobertson138/aegis_track.py), delete everything, paste this text block, and save (Ctrl + O, Enter, Ctrl + X).
