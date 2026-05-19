@@ -15,11 +15,12 @@ THRESHOLD_ATTEMPTS = 5
 TIME_WINDOW_SECONDS = 60
 ALERT_LOG_PATH = "aegis_alerts.json"
 
-# CLOUD VAULT PRODUCTION PARAMETERS
-AWS_ACCESS_KEY = "AWS_ACCESS_KEY_ID"
-AWS_SECRET_KEY = "AWS_SECRET_ACCESS_KEY"
+# CLOUD VAULT PRODUCTION PARAMETERS - SECURE OS ENVIRONMENT VARIABLES
+AWS_ACCESS_KEY = os.environ.get("AWS_ACCESS_KEY_ID")
+AWS_SECRET_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
 AWS_REGION = "us-east-2"  # Hardcoded deployment region target
 AWS_BUCKET_NAME = "aegis-track-logs-nicholas"  # Hardcoded destination asset label
+
 # REGEX PATTERNS FOR AUTHENTICATION FAILURES
 FAILED_AUTH_PATTERN = re.compile(r"Failed password for .* from (?P<ip>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})")
 SUDO_FAILURE_PATTERN = re.compile(r"authentication failure;.*user=(?P<user>\w+)")
@@ -28,10 +29,18 @@ class AegisTracker:
     def __init__(self, local_only=False):
         self.ip_tracker = {}
         self.local_only = local_only
-        self.hostname = os.uname()[1]  # Identifies which node generated the telemetry
+        
+        # FIX: Ensure hostname extracts purely as a clean string text asset
+        self.hostname = os.uname().nodename  
         
         print(f"[*] Aegis-Track Initialized on Node: {self.hostname}")
         print(f"[*] Monitoring: {LOG_FILE_PATH}")
+        
+        if not self.local_only and (not AWS_ACCESS_KEY or not AWS_SECRET_KEY):
+            print("[!] Error: Cloud pipeline requested but AWS Environment Variables are missing!")
+            print("[*] Falling back to local-only logging mode safety protocols.")
+            self.local_only = True
+
         if self.local_only:
             print("[!] Running in LOCAL-ONLY mode. Cloud forwarding disabled.")
         else:
@@ -54,6 +63,8 @@ class AegisTracker:
         payload_bytes = json.dumps(alert_payload).encode('utf-8')
         method = 'PUT'
         service = 's3'
+        
+        # REGIONAL FIX: For us-east-2, host must explicitly use regional endpoints
         host = f'{AWS_BUCKET_NAME}.s3.{AWS_REGION}.amazonaws.com'
         endpoint = f'https://{host}/{object_name}'
         
@@ -61,6 +72,7 @@ class AegisTracker:
         amz_date = t.strftime('%Y%m%dT%H%M%SZ')
         date_stamp = t.strftime('%Y%m%d')
         
+        # URI FIX: Canonical URI must strictly match the absolute resource path
         canonical_uri = f'/{object_name}'
         canonical_querystring = ''
         canonical_headers = f'host:{host}\nx-amz-date:{amz_date}\n'
@@ -80,7 +92,8 @@ class AegisTracker:
             'Host': host,
             'x-amz-date': amz_date,
             'Authorization': authorization_header,
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Content-Length': str(len(payload_bytes)) # Explicitly broadcast size metric
         }
         
         try:
@@ -161,3 +174,4 @@ if __name__ == "__main__":
 
     tracker = AegisTracker(local_only=args.local_only)
     tracker.watch_log()
+
