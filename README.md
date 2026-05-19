@@ -52,4 +52,4 @@ Authorship & Professional Framework Alignments
 * Framework Mappings: NIST SP 800-30 Risk Assessment, MITRE ATT&CK Framework
 [CRITICAL INTERVENTION] [2026-05-16 00:55:23] Target: 192.168.40.25 flagged for SSH Brute Force.
 [CRITICAL INTERVENTION] [2026-05-16 01:00:14] Target: 192.168.40.25 flagged for SSH Brute Force.
-<img width="553" height="604" alt="terminal-screenshot" src="https://github.com/user-attachments/assets/cf236f20-45ec-4a39-a1c5-4e1234f1d1f5" />
+<img width="1280" height="800" alt="Image" src="https://github.com/user-attachments/assets/fe6eb814-787d-4eb7-a242-ca8eae854733" />
