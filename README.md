@@ -53,3 +53,4 @@ Authorship & Professional Framework Alignments
 [CRITICAL INTERVENTION] [2026-05-16 00:55:23] Target: 192.168.40.25 flagged for SSH Brute Force.
 [CRITICAL INTERVENTION] [2026-05-16 01:00:14] Target: 192.168.40.25 flagged for SSH Brute Force.
 <img width="1280" height="800" alt="Image" src="https://github.com/user-attachments/assets/fe6eb814-787d-4eb7-a242-ca8eae854733" />
+<img width="720" height="399" alt="Image" src="https://github.com/user-attachments/assets/c6230b6c-c242-48e8-9a3d-44dac9c575f5" />
