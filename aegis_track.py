@@ -57,13 +57,26 @@ class AegisTracker:
         return k_signing
 
     def forward_to_s3(self, alert_payload, object_name):
-        if self.local_only:
-            return
-            
-        payload_bytes = json.dumps(alert_payload, ensure_ascii=True).encode('utf-8')
-        method = 'PUT'
-        service = 's3'
-        
+    if self.local_only:
+        return
+    import boto3
+    from botocore.exceptions import ClientError
+
+    try:
+        # Boto3 automatically reads AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY from the environment
+        s3_client = boto3.client('s3', region_name=AWS_REGION)
+        payload_bytes = json.dumps(alert_payload, ensure_ascii=True)
+
+        s3_client.put_object(
+            Bucket=AWS_BUCKET_NAME,
+            Key=object_name,
+            Body=payload_bytes,
+            ContentType='application/json'
+        )
+        print(f"[CLOUD SUCCESS] Immutable log archived -> {object_name}")
+    except ClientError as e:
+        print(f"[CLOUD ERROR] Out-of-band pipeline degraded: {e}")
+
         # REGIONAL FIX: For us-east-2, host must explicitly use regional endpoints
         host = f'{AWS_BUCKET_NAME}.s3.{AWS_REGION}.amazonaws.com'
         endpoint = f'https://{host}/{object_name}'
@@ -76,11 +89,11 @@ class AegisTracker:
         canonical_uri = f'/{object_name}'
         canonical_querystring = ''
         
-        # FIX: Added x-amz-content-sha256 header parameter to resolve strict S3 V4 Signature mandates
+        # FIX: Ensure absolute conformity with AWS V4 Signature header layout requirements
         payload_hash = hashlib.sha256(payload_bytes).hexdigest()
-        canonical_headers = f'host:{host}\nx-amz-content-sha256:{payload_hash}\nx-amz-date:{amz_date}\n'
+        canonical_headers = f"host:{host}\nx-amz-content-sha256:{payload_hash}\nx-amz-date:{amz_date}\n"
         signed_headers = 'host;x-amz-content-sha256;x-amz-date'
-        
+
         canonical_request = f"{method}\n{canonical_uri}\n{canonical_querystring}\n{canonical_headers}\n{signed_headers}\n{payload_hash}"
         
         algorithm = 'AWS4-HMAC-SHA256'
