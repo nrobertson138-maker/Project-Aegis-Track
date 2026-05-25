@@ -51,6 +51,8 @@ This setup mimics a company with multiple small branch offices. I tested the too
 To test the tool and see security alerts on the local screen without setting up AWS cloud access:
 ```bash
 sudo python3 aegis_track.py --local-only
+
+
 Cloud Mode (Production Setup)
 Make sure your computer has the correct AWS permission settings (s3:PutObject) before running the production tool:
 
@@ -58,6 +60,9 @@ Make sure your computer has the correct AWS permission settings (s3:PutObject) b
 To test the tool and see security alerts on the local screen without setting up AWS cloud access:
 ```bash
 sudo python3 aegis_track.py --local-only
+```
+
+---
 
 * Developer: Nicholas Robertson
 * Professional Credentials: CompTIA CySA+ | CompTIA Linux+ | CompTIA Security+ | CompTIA Network+ | CompTIA A+
@@ -67,3 +72,4 @@ sudo python3 aegis_track.py --local-only
 <img width="1280" height="800" alt="Image" src="https://github.com/user-attachments/assets/fe6eb814-787d-4eb7-a242-ca8eae854733" />
 <img width="720" height="399" alt="Image" src="https://github.com/user-attachments/assets/c6230b6c-c242-48e8-9a3d-44dac9c575f5" />
 <img width="859" height="800" alt="Image" src="https://github.com/user-attachments/assets/ce0c076d-c80f-4b7d-814d-4f79e5abd643" />
+
