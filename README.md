@@ -1,3 +1,4 @@
+```markdown
 # Aegis-Track: Automated Linux Security Monitor & Cloud Logger
 
 ## Project Overview
@@ -10,6 +11,7 @@ To prove this tool works on different kinds of systems, I tested it in a physica
 ## How the Data Flows
 The tool handles the heavy lifting locally on the computer and automatically sends the data to the cloud:
 
+```text
 [ 3 Physical Lab Computers ] ──> Running Rocky Linux 9 Virtual Machines
            │
            ▼ (Monitors /var/log/secure file in real time)
@@ -23,53 +25,79 @@ The tool handles the heavy lifting locally on the computer and automatically sen
                        ▼
 [ Amazon Web Services (AWS) S3 Storage ]
 
+```
+
 * **Real-Time Monitoring:** The tool watches the Linux login file (`/var/log/secure`) constantly without slowing down the system.
 * **Smart Attack Detection:** It uses custom text-matching rules (Regular Expressions) to spot fast attacks, like a hacker trying hundreds of passwords a minute (SSH brute-force). It uses time windows to tell the difference between a real attack and a regular user who just forgot their password.
-* **Safe Cloud Storage:** To meet standard financial and IT audit rules (NIST SP 800-30), security records shouldn't be kept where a hacker can reach them. Aegis-Track securely uploads alerts directly to an AWS S3 bucket so they cannot be changed or deleted.
+* **Safe Cloud Storage:** To meet standard IT audit rules (NIST SP 800-30), security records shouldn't be kept where a hacker can reach them. Aegis-Track securely uploads alerts directly to an AWS S3 bucket so they cannot be changed or deleted.
 
 ## Lab Setup & Hardware Specs
+
 This setup mimics a company with multiple small branch offices. I tested the tool on three different types of computers:
 
-### Node 1: Laptop Endpoint (macOS Base)
+* **Node 1: Laptop Endpoint (macOS Base)**
 * **Hardware:** 2019 MacBook Air (Dual-Core Intel i5, 8 GB RAM)
 * **Virtual Software:** Oracle VirtualBox running Rocky Linux 9
 * **Assigned Resources:** 2 vCPUs, 1.0 GB RAM, 40 GB Storage
 
-### Node 2: Older Desktop (Windows 10 Base)
+
+* **Node 2: Older Desktop (Windows 10 Base)**
 * **Hardware:** HP ProDesk 400 G4 (Intel i5-7500 CPU @ 3.40GHz, 8 GB RAM)
 * **Virtual Software:** Oracle VirtualBox running Rocky Linux 9
 * **Assigned Resources:** 2 vCPUs, 2.0 GB RAM, 40 GB Storage (Traditional Hard Drive)
 
-### Node 3: Newer Desktop (Windows 11 Base)
+
+* **Node 3: Newer Desktop (Windows 11 Base)**
 * **Hardware:** HP ProDesk 400 G5 (Intel i5-8500 CPU @ 3.00GHz, 8 GB RAM)
 * **Virtual Software:** Oracle VirtualBox running Rocky Linux 9
 * **Assigned Resources:** 2 vCPUs, 2.0 GB RAM, 40 GB Storage (Fast SSD Drive)
 
+
+
 ## How to Run the Tool
 
 ### Local Mode (No Cloud Setup Needed)
+
 To test the tool and see security alerts on the local screen without setting up AWS cloud access:
+
 ```bash
 sudo python3 aegis_track.py --local-only
 
+```
 
-Cloud Mode (Production Setup)
-Make sure your computer has the correct AWS permission settings (s3:PutObject) before running the production tool:
+### Cloud Mode (Production Setup)
 
-### Local Mode (No Cloud Setup Needed)
-To test the tool and see security alerts on the local screen without setting up AWS cloud access:
+Make sure your computer has the correct AWS permission settings (`s3:PutObject`) before running the production tool:
+
 ```bash
-sudo python3 aegis_track.py --local-only
+sudo python3 aegis_track.py
+
+```
+
+### Sample Terminal Output
+
+```text
+[CRITICAL INTERVENTION] [2026-05-16 00:55:23] Target: 192.168.40.25 flagged for SSH Brute Force.
+[CRITICAL INTERVENTION] [2026-05-16 01:00:14] Target: 192.168.40.25 flagged for SSH Brute Force.
+
 ```
 
 ---
 
-* Developer: Nicholas Robertson
-* Professional Credentials: CompTIA CySA+ | CompTIA Linux+ | CompTIA Security+ | CompTIA Network+ | CompTIA A+
-* Framework Mappings: NIST SP 800-30 Risk Assessment, MITRE ATT&CK Framework
-[CRITICAL INTERVENTION] [2026-05-16 00:55:23] Target: 192.168.40.25 flagged for SSH Brute Force.
-[CRITICAL INTERVENTION] [2026-05-16 01:00:14] Target: 192.168.40.25 flagged for SSH Brute Force.
+**Developer:** Nicholas Robertson
+
+**Certifications:** CompTIA CySA+ | CompTIA Linux+ | CompTIA Security+ | CompTIA Network+ | CompTIA A+
+
+**Framework Mappings:** NIST SP 800-30 Risk Assessment, MITRE ATT&CK Framework
+
+## Project Screenshots
+
 <img width="1280" height="800" alt="Image" src="https://github.com/user-attachments/assets/fe6eb814-787d-4eb7-a242-ca8eae854733" />
+
 <img width="720" height="399" alt="Image" src="https://github.com/user-attachments/assets/c6230b6c-c242-48e8-9a3d-44dac9c575f5" />
+
 <img width="859" height="800" alt="Image" src="https://github.com/user-attachments/assets/ce0c076d-c80f-4b7d-814d-4f79e5abd643" />
 
+```
+
+```
